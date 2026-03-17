@@ -42,6 +42,8 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [claude-settings-audit](plugins/promptly-skills/skills/claude-settings-audit/SKILL.md) | Analyze a repository to generate recommended Claude Code settings.json permissions. |
 | [code-review](plugins/promptly-skills/skills/code-review/SKILL.md) | Perform code reviews covering security, performance, testing, and design. |
 | [code-simplifier](plugins/promptly-skills/skills/code-simplifier/SKILL.md) | Simplify and refine code for clarity, consistency, and maintainability. |
+| [commit](plugins/promptly-skills/skills/commit/SKILL.md) | Create commits following Promptly Health conventional commit conventions. |
+| [create-branch](plugins/promptly-skills/skills/create-branch/SKILL.md) | Create git branches following Promptly Health naming conventions. |
 | [django-access-review](plugins/promptly-skills/skills/django-access-review/SKILL.md) | Django access control and IDOR security review. |
 | [django-perf-review](plugins/promptly-skills/skills/django-perf-review/SKILL.md) | Django performance code review for N+1 queries, ORM issues, and more. |
 | [doc-coauthoring](plugins/promptly-skills/skills/doc-coauthoring/SKILL.md) | Structured workflow for co-authoring documentation and specs. |
@@ -53,6 +55,7 @@ Works with Claude Code, Cursor, Cline, GitHub Copilot, and other compatible agen
 | [golang-patterns](plugins/promptly-skills/skills/golang-patterns/SKILL.md) | Go coding patterns and conventions. |
 | [golang-testing](plugins/promptly-skills/skills/golang-testing/SKILL.md) | Go testing patterns and conventions. |
 | [iterate-pr](plugins/promptly-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and review feedback is addressed. |
+| [pr-writer](plugins/promptly-skills/skills/pr-writer/SKILL.md) | Create and update PRs following Promptly Health conventions with flexible guidelines. |
 | [react-hook-form](plugins/promptly-skills/skills/react-hook-form/SKILL.md) | React Hook Form patterns and best practices. |
 | [security-review](plugins/promptly-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities (OWASP). |
 | [sentry](plugins/promptly-skills/skills/sentry/SKILL.md) | Fetch and analyze Sentry issues, events, transactions, and logs. |
