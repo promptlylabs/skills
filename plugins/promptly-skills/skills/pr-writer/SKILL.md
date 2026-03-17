@@ -3,6 +3,11 @@ name: pr-writer
 description: ALWAYS use this skill when creating or updating pull requests — never create or edit a PR directly without it. Follows Promptly Health conventions for PR titles, descriptions, and Jira linking. Trigger on any create PR, open PR, submit PR, make PR, update PR, push and create PR, or prepare changes for review task.
 ---
 
+<!--
+Based on pr-writer by Sentry:
+https://github.com/getsentry/skills
+-->
+
 # PR Writer
 
 ALWAYS follow this workflow when creating or updating PRs.

@@ -12,6 +12,12 @@ progressive_disclosure:
     - query-patterns.md
     - vs-prisma.md
 ---
+
+<!--
+Based on drizzle-orm by bobmatnyc:
+https://github.com/bobmatnyc/claude-mpm-skills
+-->
+
 # Drizzle ORM
 
 Modern TypeScript-first ORM with zero dependencies, compile-time type safety, and SQL-like syntax. Optimized for edge runtimes and serverless environments.

@@ -20,6 +20,11 @@ progressive_disclosure:
     - best_practices
 ---
 
+<!--
+Based on docker by bobmatnyc:
+https://github.com/bobmatnyc/claude-mpm-skills
+-->
+
 # Docker Containerization Skill
 
 ## Summary

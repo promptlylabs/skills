@@ -4,6 +4,11 @@ description: Fetch unread GitHub notifications for open PRs where review is requ
 allowed-tools: Bash
 ---
 
+<!--
+Based on gh-review-requests by Sentry:
+https://github.com/getsentry/skills
+-->
+
 # GitHub Review Requests
 
 Fetch unread `review_requested` notifications for open (unmerged) PRs, filtered by a GitHub team.

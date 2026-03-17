@@ -6,6 +6,9 @@ license: LICENSE
 ---
 
 <!--
+Based on security-review by Sentry:
+https://github.com/getsentry/skills
+
 Reference material based on OWASP Cheat Sheet Series (CC BY-SA 4.0)
 https://cheatsheetseries.owasp.org/
 -->

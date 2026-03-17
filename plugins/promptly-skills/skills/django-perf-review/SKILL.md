@@ -5,6 +5,11 @@ allowed-tools: Read, Grep, Glob, Bash, Task
 license: LICENSE
 ---
 
+<!--
+Based on django-perf-review by Sentry:
+https://github.com/getsentry/skills
+-->
+
 # Django Performance Review
 
 Review Django code for **validated** performance issues. Research the codebase to confirm issues before reporting. Report only what you can prove.

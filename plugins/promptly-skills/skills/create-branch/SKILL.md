@@ -4,6 +4,11 @@ description: Create a git branch following Promptly Health naming conventions. U
 argument-hint: '[optional description of the work]'
 ---
 
+<!--
+Based on create-branch by Sentry:
+https://github.com/getsentry/skills
+-->
+
 # Create Branch
 
 Create a git branch following Promptly Health naming conventions.

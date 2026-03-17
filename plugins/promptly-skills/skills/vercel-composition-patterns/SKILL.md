@@ -12,6 +12,11 @@ metadata:
   version: '1.0.0'
 ---
 
+<!--
+Based on composition-patterns by Vercel:
+https://github.com/vercel-labs/agent-skills
+-->
+
 # React Composition Patterns
 
 Composition patterns for building flexible, maintainable React components. Avoid

@@ -7,6 +7,11 @@ description: Scan agent skills for security issues. Use when asked to "scan a sk
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
+<!--
+Based on skill-scanner by Sentry:
+https://github.com/getsentry/skills
+-->
+
 # Skill Security Scanner
 
 Scan agent skills for security issues before adoption. Detects prompt injection, malicious code, excessive permissions, secret exposure, and supply chain risks.

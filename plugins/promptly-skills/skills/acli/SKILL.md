@@ -3,6 +3,11 @@ name: acli
 description: Atlassian CLI (acli) reference for Jira Cloud. Use when the user needs to interact with Jira work items via the command line — searching, creating, viewing, editing, assigning, transitioning, commenting, linking, or bulk-operating on tickets. Triggers on mentions of "acli", "jira cli", "jira ticket", "work item", or any task involving Jira automation from the terminal.
 ---
 
+<!--
+Based on acli by Ivan Pereira:
+https://github.com/ivanrvpereira/.agents
+-->
+
 # acli — Jira Cloud CLI
 
 CLI for Jira Cloud. Commands follow `acli jira <resource> <action>` pattern.

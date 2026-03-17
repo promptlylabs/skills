@@ -3,6 +3,11 @@ name: commit
 description: ALWAYS use this skill when committing code changes — never commit directly without it. Creates commits following Promptly Health conventions with proper conventional commit format. Trigger on any commit, git commit, save changes, or commit message task.
 ---
 
+<!--
+Based on commit by Sentry:
+https://github.com/getsentry/skills
+-->
+
 # Commit
 
 ALWAYS follow this workflow when committing. Never run `git commit` without it.

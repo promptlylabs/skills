@@ -34,6 +34,11 @@ token_estimates:
   full: 5000
 ---
 
+<!--
+Based on zod by bobmatnyc:
+https://github.com/bobmatnyc/claude-mpm-skills
+-->
+
 # Zod Validation Skill
 
 ## Summary

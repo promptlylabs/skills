@@ -5,6 +5,9 @@ allowed-tools: Read, Grep, Glob, Bash, Task
 ---
 
 <!--
+Based on gha-security-review by Sentry:
+https://github.com/getsentry/skills
+
 Attack patterns and real-world examples sourced from the HackerBot Claw campaign analysis
 by StepSecurity (2025): https://www.stepsecurity.io/blog/hackerbot-claw-github-actions-exploitation
 -->

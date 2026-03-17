@@ -8,6 +8,11 @@ description: >
   @apply breaking, v3 migration issues.
 ---
 
+<!--
+Based on tailwind-theme-builder by jezweb:
+https://github.com/jezweb/claude-skills
+-->
+
 # Tailwind Theme Builder
 
 Set up a fully themed Tailwind v4 + shadcn/ui project with dark mode. Produces configured CSS, theme provider, and working component library.

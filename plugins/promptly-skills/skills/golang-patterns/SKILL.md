@@ -4,6 +4,11 @@ description: Idiomatic Go patterns, best practices, and conventions for building
 origin: ECC
 ---
 
+<!--
+Based on golang-patterns by affaan-m:
+https://github.com/affaan-m/everything-claude-code
+-->
+
 # Go Development Patterns
 
 Idiomatic Go patterns and best practices for building robust, efficient, and maintainable applications.

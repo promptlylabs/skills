@@ -7,6 +7,11 @@ metadata:
   version: "1.0.0"
 ---
 
+<!--
+Based on react-best-practices by Vercel:
+https://github.com/vercel-labs/agent-skills
+-->
+
 # Vercel React Best Practices
 
 Comprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 62 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.
