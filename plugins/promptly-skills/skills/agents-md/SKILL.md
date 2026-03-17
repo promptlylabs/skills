@@ -1,118 +1,220 @@
 ---
 name: agents-md
-description: This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. Enforces research-backed best practices for minimal, high-signal agent documentation.
+description: Generate, review, and maintain AGENTS.md (or CLAUDE.md) files. Use when creating, auditing, or updating AI agent instruction files for a codebase.
 ---
 
-# Maintaining AGENTS.md
+# AGENTS.md Generator & Reviewer
 
-AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents are capable and don't need hand-holding. Target under 60 lines; never exceed 100. Instruction-following quality degrades as document length increases.
+Generate, review, and maintain AGENTS.md files optimized for AI coding agents.
 
-## File Setup
+## Workflow Decision
 
-1. Create `AGENTS.md` at project root
-2. Create symlink: `ln -s AGENTS.md CLAUDE.md`
+Determine the task type:
 
-## Before Writing
+- **Creating a new AGENTS.md?** → Follow "Generate" below
+- **Reviewing an existing AGENTS.md?** → Follow "Review" below
+- **Updating an existing AGENTS.md?** → Follow "Update" below
 
-Analyze the project to understand what belongs in the file:
+---
 
-1. **Package manager** — Check for lock files (`pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`, `uv.lock`, `poetry.lock`)
-2. **Linter/formatter configs** — Look for `.eslintrc`, `biome.json`, `ruff.toml`, `.prettierrc`, etc. (don't duplicate these in AGENTS.md)
-3. **CI/build commands** — Check `Makefile`, `package.json` scripts, CI configs for canonical commands
-4. **Monorepo indicators** — Check for `pnpm-workspace.yaml`, `nx.json`, Cargo workspace, or subdirectory `package.json` files
-5. **Existing conventions** — Check for existing CONTRIBUTING.md, docs/, or README patterns
+## Generate
 
-## Writing Rules
+### Phase 1: Analyze the Repository
 
-- **Headers + bullets** — No paragraphs
-- **Code blocks** — For commands and templates
-- **Reference, don't embed** — Point to existing docs: "See `CONTRIBUTING.md` for setup" or "Follow patterns in `src/api/routes/`"
-- **No filler** — No intros, conclusions, or pleasantries
-- **Trust capabilities** — Omit obvious context
-- **Prefer file-scoped commands** — Per-file test/lint/typecheck commands over project-wide builds
-- **Don't duplicate linters** — Code style lives in linter configs, not AGENTS.md
+Before writing anything, analyze and report:
 
-## Required Sections
+1. **Repository type**: Monorepo, multi-package, or simple project?
+2. **Tech stack**: Languages, frameworks, versions, key tools
+3. **Major directories** needing their own scoped AGENTS.md
+4. **Build system**: Package manager, workspaces, task runner
+5. **Testing setup**: Test runner, test locations, coverage tools
+6. **Key patterns**: Naming conventions, file organization, existing examples
+7. **Existing config**: Extract commands from Makefile, package.json, pyproject.toml, go.mod, etc.
 
-### Package Manager
-Which tool and key commands only:
-```markdown
-## Package Manager
-Use **pnpm**: `pnpm install`, `pnpm dev`, `pnpm test`
-```
+Present findings to the user before generating files. Ask about any gaps.
 
-### File-Scoped Commands
-Per-file commands are faster and cheaper than full project builds. Always include when available:
-```markdown
-## File-Scoped Commands
-| Task | Command |
-|------|---------|
-| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
-| Lint | `pnpm eslint path/to/file.ts` |
-| Test | `pnpm jest path/to/file.test.ts` |
-```
+**Filter ruthlessly:** Most of what you discover does NOT belong in the AGENTS.md. Models can read package.json, explore file trees, and grep codebases on their own. Only carry forward information the model can't discover or consistently gets wrong. When in doubt, leave it out — you can always add it later when a real problem surfaces.
 
-### Commit Attribution
-Always include this section. Agents should use their own identity:
-```markdown
-## Commit Attribution
-AI commits MUST include:
-```
-Co-Authored-By: (the agent's name and attribution byline)
-```
-Example: `Co-Authored-By: Claude Sonnet 4 <noreply@example.com>`
-```
+### Phase 2: Reconcile CLAUDE.md and AGENTS.md
 
-### Key Conventions
-Project-specific patterns agents must follow. Keep brief.
+Check for existing files at the project root:
 
-## Optional Sections
+- **No CLAUDE.md exists** → Create `CLAUDE.md` with `@AGENTS.md`. Continue to Phase 3.
+- **CLAUDE.md exists but is just `@AGENTS.md`** → Already correct. Continue.
+- **CLAUDE.md has content, no AGENTS.md exists** → Rename `CLAUDE.md` to `AGENTS.md`, create new `CLAUDE.md` with `@AGENTS.md`. Treat the renamed file as an existing AGENTS.md (switch to Update workflow).
+- **CLAUDE.md has content AND AGENTS.md exists** → Ask the user how to proceed (merge, replace, or keep both).
 
-Add only if truly needed:
-- API route patterns (show template, not explanation)
-- CLI commands (table format)
-- File naming conventions
-- Project structure hints (point to critical files, flag legacy code to avoid)
-- Monorepo overrides (subdirectory `AGENTS.md` files override root)
+The end state is always: `CLAUDE.md` starts with `@AGENTS.md`, and all agent-agnostic instructions live in `AGENTS.md`. Claude Code-specific instructions (hooks, MCP servers, slash commands, permissions, rules files, etc.) go in `CLAUDE.md` after the `@AGENTS.md` line.
 
-## Anti-Patterns
+### Phase 3: Write the Root AGENTS.md
 
-Omit these:
-- "Welcome to..." or "This document explains..."
-- "You should..." or "Remember to..."
-- Linter/formatter rules already in config files (`.eslintrc`, `biome.json`, `ruff.toml`)
-- Listing installed skills or plugins (agents discover these automatically)
-- Full project-wide build commands when file-scoped alternatives exist
-- Obvious instructions ("run tests", "write clean code")
-- Explanations of why (just say what)
-- Long prose paragraphs
+Target: **30-60 lines** for the root file. Maximum 300 lines. Instruction-following quality degrades as document length increases — keep it tight. Every line must be universally applicable — no task-specific content in the root.
 
-## Example Structure
+Include all essential sections:
 
 ```markdown
-# Agent Instructions
+# Project Name
 
-## Package Manager
-Use **pnpm**: `pnpm install`, `pnpm dev`
+## Stack
+[Tech stack with specific versions: "React 18, TypeScript 5.3, Vite 5, Tailwind 3.4"]
 
-## Commit Attribution
-AI commits MUST include:
-```
-Co-Authored-By: (the agent's name and attribution byline)
-```
+## Commands
+[Copy-paste ready commands with full flags — build, test, lint, typecheck]
 
 ## File-Scoped Commands
+[Per-file test/lint/typecheck commands — faster and cheaper than full project builds]
 | Task | Command |
 |------|---------|
 | Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
 | Lint | `pnpm eslint path/to/file.ts` |
 | Test | `pnpm jest path/to/file.test.ts` |
 
-## API Routes
-[Template code block]
+## Structure
+[Directory layout with purposes and access levels (read/write/never modify)]
 
-## CLI
-| Command | Description |
-|---------|-------------|
-| `pnpm cli sync` | Sync data |
+## Conventions
+[Code style via concrete examples referencing actual project files, not prose]
+[Naming: functions, classes, constants with real examples from the codebase]
+
+## Git
+[Commit format, branching strategy, PR process]
+
+## Commit Attribution
+AI commits MUST include:
+Co-Authored-By: (the agent's name and attribution byline)
+
+## Boundaries
+
+### Always
+[Mandatory practices for every session]
+
+### Ask First
+[Actions requiring human approval]
+
+### Never
+[Absolute prohibitions — always include "Never commit secrets"]
 ```
+
+**Key rules:**
+- Commands must be copy-paste ready with full syntax
+- Prefer file-scoped commands over project-wide builds (per-file is faster and cheaper)
+- Reference actual project files (`src/components/Button.tsx`), not hypothetical ones
+- Delegate code formatting to tools/hooks, not instructions
+- Use `file:line` references instead of embedding code snippets
+
+### Phase 4: Write Scoped Sub-Files
+
+For each major subsystem (app, service, package), create a scoped AGENTS.md:
+
+```markdown
+# Package Name
+
+## Purpose
+[1-2 lines: what it does, primary tech]
+
+## Commands
+[Package-specific: dev, build, test, lint]
+
+## Patterns
+[Concrete examples with actual file paths]
+- DO: Pattern from `src/components/Button.tsx`
+- DON'T: Anti-pattern like `src/legacy/OldButton.tsx`
+
+## Key Files
+[Important files to understand the package]
+
+## Gotchas
+[Non-obvious pitfalls specific to this package]
+```
+
+Sub-files should have MORE detail than the root — they're only loaded when the agent works in that directory.
+
+### Phase 5: Present Output
+
+Present files in order with paths:
+
+```
+--- File: AGENTS.md (root) ---
+[content]
+
+--- File: apps/web/AGENTS.md ---
+[content]
+```
+
+### Anti-Patterns
+
+Avoid these in generated AGENTS.md files:
+
+**Writing style:**
+- No filler intros ("Welcome to...", "This document explains...")
+- No condescending tone ("You should...", "Remember to...", "Make sure to...")
+- No prose paragraphs — use headers, bullets, and code blocks
+- No explaining "why" — state the rule, not the rationale
+- No duplicating skill content — reference the skill file path instead
+
+**Content quality:**
+- No hallucinated paths — verify every file reference exists before writing
+- No restating model knowledge — frontier models already know best practices (e.g., "use descriptive names", "handle errors", "follow DRY"). Only document project-specific deviations from standard practice.
+- No restating discoverable info — if the model can find it by reading package.json, tsconfig, file structure, or grepping the codebase, it doesn't belong in the AGENTS.md. Only include what the model can't find or consistently gets wrong.
+- No negative instructions — mentioning something (even "don't use X") biases the model toward it. Remove the topic entirely, or restructure the codebase so the wrong path is harder to reach.
+- No placeholder commands — extract real commands or ask the user
+- No contradictions between root and sub-files
+- No stale versions — extract programmatically from package.json/lockfiles
+- No listing installed skills or plugins — agents discover these automatically
+
+**Structure:**
+- No embedded code snippets — use `file:line` references (snippets go stale)
+- No vague stack descriptions — include specific versions
+- No missing boundaries — always include "Never commit secrets"
+- No using LLMs as linters — delegate formatting to tools/hooks
+- No uncurated /init output — LLM-generated context files perform worse than no file at all. Always manually review and strip auto-generated content down to only what the model can't discover on its own.
+- No full project-wide build commands when file-scoped alternatives exist
+
+### Quality Gate
+
+Before presenting, verify:
+- `CLAUDE.md` exists with `@AGENTS.md`
+- Root file is under 300 lines (ideally 30-60)
+- Root links to all sub-files
+- Every command is copy-paste ready
+- Examples reference real project paths
+- No duplication between root and sub-files
+- "Never commit secrets" or equivalent is present
+- Commit Attribution section is present
+
+---
+
+## Review
+
+### Process
+
+1. Read the existing AGENTS.md (and any sub-files)
+2. Evaluate against these criteria:
+   - Every line passes the "can the model discover this on its own?" test
+   - Commands are copy-paste ready and actually run
+   - File references point to paths that exist
+   - No section exceeds 20 lines (extract to sub-file)
+   - Root file is under 300 lines, ideally 30-60
+   - No duplication between root and sub-files
+   - No lines compressible 50%+ without losing meaning
+   - Boundaries include "never commit secrets" and read-only dirs
+   - Destructive/production actions gated behind "ask first"
+   - File-scoped commands are preferred over project-wide builds
+   - Commit Attribution section is present
+   - All anti-patterns from the Generate workflow are absent
+3. Propose a rewritten AGENTS.md (or diff) fixing every issue found
+4. For each change, include a one-line rationale
+
+### Output Format
+
+Present the proposed rewrite as a complete file (or files), not a report card. Precede it with a short summary of what changed and why.
+
+---
+
+## Update
+
+1. Read the existing AGENTS.md
+2. **Subtract first:** Remove lines the model no longer gets wrong, stale references, and anything discoverable from the codebase. With each model generation, agents need less steering — prune aggressively.
+3. Identify what changed in the codebase (new packages, changed commands, updated stack)
+4. Apply changes while preserving manual content
+5. Verify the file still meets the quality gate from the Generate workflow
