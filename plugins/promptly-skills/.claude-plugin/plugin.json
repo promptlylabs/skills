@@ -1,0 +1,7 @@
+{
+  "name": "promptly-skills",
+  "description": "Promptly Health agent skills for code review, commits, and more",
+  "author": {
+    "name": "Promptly Health"
+  }
+}
