@@ -1,0 +1,7 @@
+{
+  "name": "promptly-skills",
+  "keywords": ["pi-package"],
+  "pi": {
+    "skills": ["./plugins/promptly-skills/skills"]
+  }
+}
