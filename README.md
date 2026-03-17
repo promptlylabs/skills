@@ -134,6 +134,10 @@ Step-by-step guidance for the agent.
 
 - [Agent Skills Specification](https://agentskills.io/specification)
 
+## Acknowledgements
+
+This project was heavily inspired by [getsentry/skills](https://github.com/getsentry/skills).
+
 ## License
 
 Apache-2.0
