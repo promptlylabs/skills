@@ -160,6 +160,7 @@ If the promptly-skills plugin is installed, include:
   "Skill(promptly-skills:gh-review-requests)",
   "Skill(promptly-skills:gha-security-review)",
   "Skill(promptly-skills:iterate-pr)",
+  "Skill(promptly-skills:k8s-crd-design-review)",
   "Skill(promptly-skills:kubebuilder-api-design)",
   "Skill(promptly-skills:security-review)",
   "Skill(promptly-skills:skill-scanner)",

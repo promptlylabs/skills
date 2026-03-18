@@ -59,6 +59,7 @@
       "Skill(promptly-skills:golang-patterns)",
       "Skill(promptly-skills:golang-testing)",
       "Skill(promptly-skills:iterate-pr)",
+      "Skill(promptly-skills:k8s-crd-design-review)",
       "Skill(promptly-skills:kubebuilder-api-design)",
       "Skill(promptly-skills:pr-writer)",
       "Skill(promptly-skills:react-hook-form)",

@@ -1,0 +1,252 @@
+# Example: ANTIPATTERN - Object references using Name-ending field names
+# ⚠️  This demonstrates problematic patterns that should be avoided when referencing objects
+#
+# Reference: See ../../references/object-references.md
+# Compare with: object-reference-good.yaml to see the recommended approach.
+#
+# Problems with this approach:
+# 1. Name-ending field names (taskName, taskNamespace, taskGroup) suggest the field contains ONLY a name
+# 2. Inconsistent with Kubernetes conventions (ObjectReference doesn't use Name-ending fields)
+# 3. Makes it harder to add optional reference fields later (e.g., uid)
+# 4. No space for default values without confusing semantics
+# 5. Breaks API consistency across your CRDs
+# 6. Makes CEL validation more complex
+# 7. Client libraries struggle with pattern recognition
+
+# ❌ ANTIPATTERN CRD: Pipeline resource with improper reference naming
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: pipelines.badexample.com
+spec:
+  group: badexample.com
+  scope: Namespaced
+  names:
+    kind: Pipeline
+    plural: pipelines
+    singular: pipeline
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            required:
+            - taskName  # ❌ ANTIPATTERN: Poor field naming
+            properties:
+              # ❌ ANTIPATTERN: Field named "taskName" instead of using ObjectReference pattern
+              # Problems:
+              # - Suggests the field ONLY contains a name (but what about namespace, uid, etc?)
+              # - Can't add optional reference components without breaking the naming scheme
+              # - Inconsistent with Kubernetes API conventions
+              # - Hard to extend to cross-namespace or cross-cluster references
+              taskName:
+                type: string
+                description: |
+                  Name of the Task resource.
+                  PROBLEM: This naming pattern doesn't leave room for namespace, group, or other reference fields.
+              
+              # ❌ ANTIPATTERN: Separate fields for each component of the reference
+              # This approach forces users to specify related information in multiple fields
+              taskNamespace:
+                type: string
+                description: "Namespace of the Task (required to be specified separately)"
+              
+              taskGroup:
+                type: string
+                description: "Group of the Task (required to be specified separately)"
+              
+              taskKind:
+                type: string
+                description: "Kind of the Task (required to be specified separately)"
+              
+              # ❌ ANTIPATTERN: Can't set defaults without confusing semantics
+              # If we add: default: "example.com" to taskGroup, it's unclear why a separate
+              # field would have a default - doesn't match Kubernetes patterns
+              
+              # ❌ ANTIPATTERN: Multiple task references become repetitive
+              # For each additional task reference, you need taskName2, taskNamespace2, etc.
+              secondaryTaskName:
+                type: string
+                description: "Name of a secondary task (repetitive naming)"
+              
+              secondaryTaskNamespace:
+                type: string
+                description: "Namespace of the secondary task"
+              
+              secondaryTaskGroup:
+                type: string
+                description: "Group of the secondary task"
+          
+          status:
+            type: object
+            properties:
+              # ❌ ANTIPATTERN: Inconsistent naming in status
+              currentTaskName:
+                type: string
+              
+              resolvedTaskNamespace:
+                type: string
+              
+              resolvedTaskUid:
+                type: string
+              
+              # ❌ PROBLEM: No way to know which fields belong together
+              # - Are currentTaskName and resolvedTaskNamespace related to the same resource?
+              # - Should both be required, or is one optional?
+              # - This makes validation rules much more complex
+
+---
+# ❌ ANTIPATTERN CRD: Task resource with improper reference naming
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: tasks.badexample.com
+spec:
+  group: badexample.com
+  scope: Namespaced
+  names:
+    kind: Task
+    plural: tasks
+    singular: task
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            properties:
+              image:
+                type: string
+              
+              # ❌ ANTIPATTERN: Array of Name-ending references
+              # Each dependency requires separate name/namespace/group fields
+              dependencyNames:
+                type: array
+                description: "Names of task dependencies (partial information)"
+                items:
+                  type: string
+              
+              dependencyNamespaces:
+                type: array
+                description: "Namespaces of task dependencies (parallel array)"
+                items:
+                  type: string
+              
+              # ❌ MAJOR PROBLEM: Parallel arrays can become out of sync
+              # - If dependencyNames has 3 items and dependencyNamespaces has 2, which is correct?
+              # - No way to validate they're the same length without custom validation
+              # - CEL rules become complex: `size(self.dependencyNames) == size(self.dependencyNamespaces)`
+              # - Kubernetes strongly discourages this pattern (see list-semantics-gitops-ssa.md)
+
+---
+# ❌ ANTIPATTERN CRD: Cross-resource references without proper structure
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: workflows.badexample.com
+spec:
+  group: badexample.com
+  scope: Namespaced
+  names:
+    kind: Workflow
+    plural: workflows
+    singular: workflow
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            properties:
+              # ❌ ANTIPATTERN: Mix of Name-ending and Object reference patterns
+              # This inconsistency is confusing to API users
+              triggerTaskName:
+                type: string
+                description: "Name of the task that triggers the workflow"
+              
+              triggerTaskNamespace:
+                type: string
+                description: "Namespace of the trigger task"
+              
+              # ❌ Then for other references, a different pattern is used
+              targetPipelineName:
+                type: string
+              
+              targetPipelineNamespace:
+                type: string
+              
+              targetPipelineGroup:
+                type: string
+              
+              # ❌ PROBLEM: Inconsistent API across your CRD ecosystem
+              # Each CRD ends up with a slightly different reference pattern
+              # This makes client libraries harder to build and makes the API harder to learn
+
+---
+# Example: Usage demonstrating the antipattern
+# PROBLEMS with this verbose and error-prone approach:
+apiVersion: badexample.com/v1
+kind: Pipeline
+metadata:
+  name: my-pipeline
+spec:
+  # ❌ VERBOSE: Must specify name, namespace, and group separately
+  taskName: my-task
+  taskNamespace: default
+  taskGroup: badexample.com
+  taskKind: Task
+  
+  # ❌ VERBOSE: Secondary task requires more separate fields
+  secondaryTaskName: other-task
+  secondaryTaskNamespace: other-namespace
+  secondaryTaskGroup: badexample.com
+  
+  # ❌ REPETITIVE: Same information structure, repeated multiple times
+
+---
+# Example: Task with problematic dependency references
+apiVersion: badexample.com/v1
+kind: Task
+metadata:
+  name: my-task
+spec:
+  image: python:3.11
+  # ❌ PROBLEM: Parallel arrays that can get out of sync
+  dependencyNames:
+  - setup-task
+  - fetch-data-task
+  dependencyNamespaces:
+  - default
+  - default
+  # ^ If these arrays have different lengths, it's ambiguous which name
+  #   corresponds to which namespace. Validation must catch this.
+
+---
+# MIGRATION GUIDANCE:
+# If you have an existing CRD with these antipatterns, you need to:
+#
+# 1. Define a new version with the proper ObjectReference pattern
+# 2. Use conversion webhooks to translate old Name-ending fields to new structure
+# 3. Deprecate the old fields gradually
+# 4. Update documentation to recommend the new pattern
+#
+# See ../../references/object-references.md for detailed migration steps

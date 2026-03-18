@@ -1,0 +1,165 @@
+---
+# Example: Good CRD with explicit schema and proper field handling
+# This demonstrates best practices for handling flexible data without x-kubernetes-preserve-unknown-fields
+#
+# Reference: See ../../references/versioning-and-migrations.md#preserving-unknown-fields-advanced-topic
+# for detailed discussion of preserveUnknownFields deprecation and best practices.
+# Compare with: crd-preserveunknownfields-antipattern.yaml to see what NOT to do.
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: workflows.example.com
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    kind: Workflow
+    plural: workflows
+    singular: workflow
+    shortNames:
+    - wf
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            required:
+            - template
+            properties:
+              # ✅ GOOD: Explicit field definitions
+              parallelism:
+                type: integer
+                minimum: 1
+                maximum: 100
+                default: 1
+              retryPolicy:
+                type: object
+                properties:
+                  maxAttempts:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                  backoffSeconds:
+                    type: integer
+                    minimum: 1
+              
+              # ✅ GOOD: Using additionalProperties instead of x-kubernetes-preserve-unknown-fields
+              # This allows users to pass custom configuration but in an explicit, bounded way
+              customConfig:
+                type: object
+                description: "Custom workflow configuration (key-value pairs)"
+                additionalProperties:
+                  type: string
+                maxProperties: 50
+              
+              # ✅ GOOD: Embedded resource with explicit fields needed
+              podTemplate:
+                type: object
+                description: "Pod template for workflow execution"
+                properties:
+                  apiVersion:
+                    type: string
+                  kind:
+                    type: string
+                  metadata:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      labels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                  spec:
+                    type: object
+                    additionalProperties: true  # ✅ Explicitly bounded
+                # ✅ NOT using x-kubernetes-preserve-unknown-fields or x-kubernetes-embedded-resource
+                # Instead, we define exactly which Pod fields we support
+              
+              # ✅ GOOD: Template field with full flexibility but bounded
+              template:
+                type: object
+                required:
+                - image
+                properties:
+                  image:
+                    type: string
+                    pattern: '^[a-zA-Z0-9./:_-]+(@sha256:[a-f0-9]{64})?$'
+                  imagePullPolicy:
+                    type: string
+                    enum:
+                    - Always
+                    - IfNotPresent
+                    - Never
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    maxItems: 100
+          
+          status:
+            type: object
+            properties:
+              # ✅ GOOD: Structured status with clear fields
+              # Note: This workflow is designed for bounded execution (not long-running)
+              phase:
+                type: string
+                enum:
+                - Succeeded
+                - Failed
+                - Unknown
+              conditions:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - type
+                  - status
+                  - lastTransitionTime
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum:
+                      - "True"
+                      - "False"
+                      - "Unknown"
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                # ✅ GOOD: Map-style conditions for SSA/GitOps safety
+                x-kubernetes-list-type: map
+                x-kubernetes-list-map-keys:
+                - type
+              observedGeneration:
+                type: integer
+              startTime:
+                type: string
+                format: date-time
+              completionTime:
+                type: string
+                format: date-time
+    additionalPrinterColumns:
+    # ✅ GOOD: Show health signal; kubectl already shows AGE so don't duplicate it
+    - name: Phase
+      type: string
+      jsonPath: .status.phase
+      priority: 0
+    - name: Message
+      type: string
+      jsonPath: .status.conditions[?(@.type=="Succeeded")].message
+      priority: 1

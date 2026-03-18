@@ -1,0 +1,231 @@
+# Example: Good object references between resources
+# ✅ This demonstrates best practices for referencing objects between CRDs
+#
+# Reference: See ../../references/object-references.md
+# Compare with: object-reference-antipattern.yaml to see what NOT to do.
+#
+# Key principles:
+# 1. Use ObjectReference-style structured references
+# 2. Set defaults for group/kind so users only need to specify name
+# 3. Use proper field naming conventions (without "Name" suffix for full references)
+# 4. Include comprehensive documentation for each field
+
+# CRD for Pipeline resource (the parent/referencing resource)
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: pipelines.example.com
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    kind: Pipeline
+    plural: pipelines
+    singular: pipeline
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            required:
+            - taskRef
+            properties:
+              # ✅ GOOD: Reference to a Task resource
+              # Users can specify just the name when the Task is in the same namespace
+              # and the default group/kind points to "example.com" and "Task"
+              taskRef:
+                type: object
+                description: |
+                  Reference to a Task resource to execute in this pipeline.
+                  Supports shorthand notation by setting defaults for group and kind.
+                required:
+                - name
+                properties:
+                  # ✅ GOOD: Use "name" for the resource name (not taskName)
+                  name:
+                    type: string
+                    description: "Name of the Task resource in the same namespace"
+                  
+                  # ✅ GOOD: group field with default
+                  group:
+                    type: string
+                    description: "Group of the Task resource (defaults to 'example.com')"
+                    default: "example.com"
+                  
+                  # ✅ GOOD: kind field with default
+                  kind:
+                    type: string
+                    description: "Kind of the resource (defaults to 'Task')"
+                    default: "Task"
+                  
+                  # ✅ GOOD: namespace field is omitted, since in most cases you don't want to reference cross namespaces (take time to think through/document the security consequences if you do!)
+          
+          status:
+            type: object
+            properties:
+              # ✅ GOOD: Store minimal resolved reference data when needed for audit
+              resolvedTask:
+                type: object
+                description: "Minimal resolved Task reference for audit/observability"
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                  uid:
+                    type: string
+                    description: "UID of the Task resource for strong consistency"
+
+              # ✅ GOOD: Prefer conditions over phase-style enums for new APIs
+              conditions:
+                type: array
+                x-kubernetes-list-type: map
+                x-kubernetes-list-map-keys:
+                  - type
+                items:
+                  type: object
+                  required: [type, status, lastTransitionTime, reason]
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ["True", "False", "Unknown"]
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                    reason:
+                      type: string
+                    message:
+                      type: string
+
+---
+# CRD for Task resource (the resource being referenced)
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: tasks.example.com
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    kind: Task
+    plural: tasks
+    singular: task
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            required:
+            - image
+            properties:
+              image:
+                type: string
+                description: "Container image to execute"
+                pattern: '^[a-zA-Z0-9./:_-]+(@sha256:[a-f0-9]{64})?$'
+              
+              # ✅ GOOD: A Task can reference other resources it depends on
+              dependsOn:
+                type: array
+                description: |
+                  List of Task resources that must complete before this task runs.
+                  Only include if the controller implements explicit dependency orchestration semantics.
+                items:
+                  type: object
+                  required:
+                  - name
+                  properties:
+                    name:
+                      type: string
+                      description: "Name of the dependent Task"
+                    group:
+                      type: string
+                      default: "example.com"
+                    kind:
+                      type: string
+                      default: "Task"
+          
+          status:
+            type: object
+            properties:
+              # ✅ GOOD: Prefer conditions over phase-style enums for new APIs
+              conditions:
+                type: array
+                x-kubernetes-list-type: map
+                x-kubernetes-list-map-keys:
+                  - type
+                items:
+                  type: object
+                  required: [type, status, lastTransitionTime, reason]
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ["True", "False", "Unknown"]
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                    reason:
+                      type: string
+                    message:
+                      type: string
+
+---
+# Example: Usage demonstrating the good pattern
+# A Pipeline referencing a Task (only name needed due to defaults)
+apiVersion: example.com/v1
+kind: Pipeline
+metadata:
+  name: my-pipeline
+  namespace: default
+spec:
+  # ✅ SIMPLE: Just specify the name, defaults handle group/kind
+  taskRef:
+    name: my-task
+  # OR full specification:
+  # taskRef:
+  #   name: my-task
+  #   group: example.com
+  #   kind: Task
+
+---
+# Example: A Task that depends on other Tasks
+apiVersion: example.com/v1
+kind: Task
+metadata:
+  name: my-task
+  namespace: default
+spec:
+  image: python:3.11
+  # ✅ SIMPLE: Just specify names, defaults handle group/kind
+  dependsOn:
+  - name: setup-task
+  - name: fetch-data-task
+  # OR explicitly:
+  # dependsOn:
+  # - name: setup-task
+  #   group: example.com
+  #   kind: Task
+  # - name: fetch-data-task
+  #   group: example.com
+  #   kind: Task

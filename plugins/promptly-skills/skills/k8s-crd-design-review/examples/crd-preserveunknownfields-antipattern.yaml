@@ -1,0 +1,122 @@
+---
+# Example: ANTIPATTERN - CRD using x-kubernetes-preserve-unknown-fields
+# ⚠️  This CRD demonstrates problematic patterns that should be avoided
+#
+# Reference: See ../../references/versioning-and-migrations.md#preserving-unknown-fields-advanced-topic
+# for detailed discussion of why these patterns are problematic.
+# Compare with: crd-preserveunknownfields-good.yaml to see the recommended approach.
+#
+# Problems with this approach:
+# 1. Security risk: unknown fields can bypass validation and be stored in etcd
+# 2. Prevents schema evolution and version migration
+# 3. CEL validation rules cannot access preserved fields
+# 4. Incompatible with conversion webhooks and defaulting
+# 5. Breaks client-side validation tools (kubectl, IDEs)
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: workflows.example.com
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    kind: Workflow
+    plural: workflows
+    singular: workflow
+    shortNames:
+    - wf
+  # ❌ AVOID: Using preserveUnknownFields at the CRD level
+  # By default this is false in v1, but some older CRDs might have this
+  preserveUnknownFields: false  # Default, but sometimes explicitly set to true on v1beta1 CRDs
+  
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        # ❌ ANTIPATTERN: Using x-kubernetes-preserve-unknown-fields at root
+        x-kubernetes-preserve-unknown-fields: true
+        properties:
+          metadata:
+            type: object
+          spec:
+            type: object
+            # ❌ ANTIPATTERN: No validation of critical fields
+            # Users could pass any structure without explicit schema
+            properties:
+              # ❌ VAGUE: What does this field actually contain?
+              config:
+                type: object
+                # ❌ ANTIPATTERN: Using x-kubernetes-preserve-unknown-fields to avoid defining schema
+                x-kubernetes-preserve-unknown-fields: true
+                # This means config can contain anything and nothing is validated
+                # A controller or webhook must validate it (operational burden)
+              
+              # ❌ ANTIPATTERN: Embedded Kubernetes resource without proper constraints
+              podTemplate:
+                description: "Pod template for workflow execution"
+                # ❌ ANTIPATTERN: Combining both these extensions without clear rationale
+                x-kubernetes-embedded-resource: true
+                x-kubernetes-preserve-unknown-fields: true
+                # This doesn't prevent a malicious user from:
+                # - Storing unrelated Pod fields not needed for your workflow
+                # - Injecting spec fields that bypass your controller's validation
+                # - Evolving the CRD later (can't add validation without breaking existing data)
+              
+              # ❌ ANTIPATTERN: Required field without proper documentation
+              template:
+                type: object
+                # ❌ VAGUE: May contain arbitrary fields, no validation
+                x-kubernetes-preserve-unknown-fields: true
+                # Users won't know what fields are actually supported by the controller
+        
+          status:
+            type: object
+            # ❌ ANTIPATTERN: Status also uses preserve-unknown-fields
+            x-kubernetes-preserve-unknown-fields: true
+            # This means:
+            # - Controllers could store arbitrary state without structure
+            # - Operators can't rely on any fields existing
+            # - CEL validation rules can't validate status transitions
+            properties:
+              # These fields are defined but anything else is allowed
+              phase:
+                type: string
+                # ❌ ANTIPATTERN: "Pending" and "Running" states indicate long-lived object tracking
+                # This is problematic because:
+                # - Active states require continuous reconciliation loops (operational burden)
+                # - Controllers must handle resource exhaustion during long-lived states
+                # - Kubernetes is designed for bounded execution patterns, not state machines
+                # - Better approach: design for terminal states (Succeeded/Failed) or use Conditions for active tracking
+                enum:
+                - Pending
+                - Running
+                - Succeeded
+                - Failed
+                - Unknown
+              conditions:
+                type: array
+                # ❌ ANTIPATTERN: Conditions stored as list without x-kubernetes-list-type
+                items:
+                  type: object
+                  # ❌ CONDITIONS: Loose structure with unknown fields allowed
+                  x-kubernetes-preserve-unknown-fields: true
+    
+    # ❌ ANTIPATTERN: No printer columns
+    # Users get no helpful output from `kubectl get workflows`
+    # They can't see health status, phase, or other important information
+    #
+    # Should include something like:
+    # additionalPrinterColumns:
+    # - name: Phase
+    #   type: string
+    #   jsonPath: .status.phase
+
+# Migration guidance:
+# If you have an existing CRD with these antipatterns, see 
+# ../../references/versioning-and-migrations.md#interaction-with-x-kubernetes-embedded-resource
+# for how to evolve to a proper schema while maintaining backward compatibility

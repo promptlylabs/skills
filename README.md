@@ -83,6 +83,7 @@ npx skills update
 | [golang-patterns](plugins/promptly-skills/skills/golang-patterns/SKILL.md) | Go coding patterns and conventions. | [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) |
 | [golang-testing](plugins/promptly-skills/skills/golang-testing/SKILL.md) | Go testing patterns and conventions. | [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) |
 | [iterate-pr](plugins/promptly-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and review feedback is addressed. | [getsentry/skills](https://github.com/getsentry/skills) |
+| [k8s-crd-design-review](plugins/promptly-skills/skills/k8s-crd-design-review/SKILL.md) | Kubernetes CRD design review: schema, conditions, SSA, versioning, compatibility. | [configbutler/skills](https://github.com/configbutler/skills) |
 | [kubebuilder-api-design](plugins/promptly-skills/skills/kubebuilder-api-design/SKILL.md) | Kubebuilder Go API type design, CRD markers, validation, and generation workflow. | [configbutler/skills](https://github.com/configbutler/skills) |
 | [pr-writer](plugins/promptly-skills/skills/pr-writer/SKILL.md) | Create and update PRs following Promptly Health conventions with flexible guidelines. | [getsentry/skills](https://github.com/getsentry/skills) |
 | [react-hook-form](plugins/promptly-skills/skills/react-hook-form/SKILL.md) | React Hook Form patterns and best practices. | [pproenca/dot-skills](https://github.com/pproenca/dot-skills) |
