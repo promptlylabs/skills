@@ -156,9 +156,11 @@ If the promptly-skills plugin is installed, include:
   "Skill(promptly-skills:django-perf-review)",
   "Skill(promptly-skills:doc-coauthoring)",
   "Skill(promptly-skills:find-bugs)",
+  "Skill(promptly-skills:frontend-design)",
   "Skill(promptly-skills:gh-review-requests)",
   "Skill(promptly-skills:gha-security-review)",
   "Skill(promptly-skills:iterate-pr)",
+  "Skill(promptly-skills:kubebuilder-api-design)",
   "Skill(promptly-skills:security-review)",
   "Skill(promptly-skills:skill-scanner)",
   "Skill(promptly-skills:skill-writer)"

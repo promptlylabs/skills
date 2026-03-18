@@ -77,11 +77,13 @@ npx skills update
 | [docker](plugins/promptly-skills/skills/docker/SKILL.md) | Docker best practices for containerization. | [bobmatnyc/claude-mpm-skills](https://github.com/bobmatnyc/claude-mpm-skills) |
 | [drizzle-orm](plugins/promptly-skills/skills/drizzle-orm/SKILL.md) | Drizzle ORM patterns and best practices. | [bobmatnyc/claude-mpm-skills](https://github.com/bobmatnyc/claude-mpm-skills) |
 | [find-bugs](plugins/promptly-skills/skills/find-bugs/SKILL.md) | Find bugs, security vulnerabilities, and code quality issues in branch changes. | [getsentry/skills](https://github.com/getsentry/skills) |
+| [frontend-design](plugins/promptly-skills/skills/frontend-design/SKILL.md) | Create distinctive, production-grade frontend interfaces with high design quality. | [anthropics/skills](https://github.com/anthropics/skills) |
 | [gh-review-requests](plugins/promptly-skills/skills/gh-review-requests/SKILL.md) | Fetch unread GitHub notifications for PRs needing team review. | [getsentry/skills](https://github.com/getsentry/skills) |
 | [gha-security-review](plugins/promptly-skills/skills/gha-security-review/SKILL.md) | GitHub Actions security review for workflow exploitation vulnerabilities. | [getsentry/skills](https://github.com/getsentry/skills) |
 | [golang-patterns](plugins/promptly-skills/skills/golang-patterns/SKILL.md) | Go coding patterns and conventions. | [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) |
 | [golang-testing](plugins/promptly-skills/skills/golang-testing/SKILL.md) | Go testing patterns and conventions. | [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) |
 | [iterate-pr](plugins/promptly-skills/skills/iterate-pr/SKILL.md) | Iterate on a PR until CI passes and review feedback is addressed. | [getsentry/skills](https://github.com/getsentry/skills) |
+| [kubebuilder-api-design](plugins/promptly-skills/skills/kubebuilder-api-design/SKILL.md) | Kubebuilder Go API type design, CRD markers, validation, and generation workflow. | [configbutler/skills](https://github.com/configbutler/skills) |
 | [pr-writer](plugins/promptly-skills/skills/pr-writer/SKILL.md) | Create and update PRs following Promptly Health conventions with flexible guidelines. | [getsentry/skills](https://github.com/getsentry/skills) |
 | [react-hook-form](plugins/promptly-skills/skills/react-hook-form/SKILL.md) | React Hook Form patterns and best practices. | [pproenca/dot-skills](https://github.com/pproenca/dot-skills) |
 | [security-review](plugins/promptly-skills/skills/security-review/SKILL.md) | Security code review for vulnerabilities (OWASP). | [getsentry/skills](https://github.com/getsentry/skills) |
